@@ -1,3 +1,14 @@
+---
+title: "Lab 4: Import Data"
+author: "Kate Roetcisoender"
+date: "today"
+format: html
+editor: source
+embed-resources: true
+code-tools: true
+echo: true
+---
+
 # Part 1: Setup
 
 ## GitHub Workflow
@@ -66,10 +77,10 @@ Read the data into R. Since it is a `txt` file it is considered a "whitespace-se
 
 When you read in the data give it an appropriate name for what the data represents. The read in file should look like this (note this is just the first seven columns):  
 
-```{r}
+```{r, eval = FALSE}
 #| label: load-data
 
-buoy <- read_delim("raw-data/buoy_2024.txt")
+buoy <- read_table("raw-data/buoy_2024.txt")
 head(buoy, 7)
 
 ```
@@ -79,10 +90,10 @@ Notice that the data is all read in as a character value and the first row conta
 ## Step 2: Specify the Comment Row  
 In your data, you will notice the `#` in front of `yr` in the second row. That is the symbol that indicates a comment in the data set. Using the cheatsheet or the (readr)[https://readr.tidyverse.org/index.html] website, add an argument to your function that indicates that the comment row begins with `#`.  Your data should now look like this:
 
-```{r}
+```{r, eval = FALSE}
 #| label: load-data-comment
 
-buoy <- read_delim("raw-data/buoy_2024.txt", comment = "#")
+buoy <- read_table("raw-data/buoy_2024.txt", comment = "#")
 head(buoy, 7)
 
 ```
@@ -91,7 +102,7 @@ head(buoy, 7)
 ## Step 3: Clean the Variable Names  
 We want to use snake_case for our variable names. Use the `janitor` package to clean the variable names. Notice, that because month was originally coded `MM` and minute was originally coded `mm` that now month is `mm` and minute is `mm_2` to create a distinction between them.  
 
-```{r}
+```{r, eval = FALSE}
 #| label: clean-names
 
 buoy <- janitor::clean_names(buoy)
@@ -104,11 +115,10 @@ We will have a bit of cleaning to do on the data, but we have an issue. The 99 a
 
 Write the data to a `csv` file called `buoy_update.csv`. Be sure to write it to your `data-raw` folder.  
 
-```{r}
+```{r, eval = FALSE}
 #| label: write-data-part-1
 
 buoy_update <- write_csv(buoy, file = "raw-data/buoy_update.csv")
-
 ```
 
 
@@ -121,10 +131,12 @@ Now we will read the data back in, be sure to assign the it a meaningful object 
 
 Remember that now we are reading back in a data file of type `csv`. Now when you look at the data we should have `NA` instead of `99` or `999` in our data, for example:
 
-```{r}
+```{r, eval = FALSE}
 #| label: load-data-again
 
+noaa_buoy <- read_csv("raw-data/buoy_update.csv", col_types = cols(.default = "c"), na = c("99", "999")) #https://github.com/tidyverse/readr/issues/148
 
+head(noaa_buoy)
 
 ```
 
@@ -132,10 +144,17 @@ This is great! But we created another problem. Now all of our numeric values are
 
 Here is the code you can use to fix the data without exporting and importing again (we will learn more about the `mutate()` function. Insert whatever you called your buoy data on the last import for `your_file_name`.  
 
-```{r}
+```{r, eval = FALSE}
 #| label: parse-double
-buoy_final <- your_file_name |> 
+buoy_final <- noaa_buoy |> 
   mutate(across(.cols = everything(), ~parse_double(.x)))
+
+head(buoy_final)
+
+write_csv(buoy_final, file = "clean-data/buoy_final.csv")
+```
+```{r}
+buoy_final <- read_csv("clean-data/buoy_final.csv")
 ```
 
 
@@ -149,6 +168,14 @@ Now that are data is "analytic ready", go ahead and read in your clean data and 
 ```{r}
 #| label: monterey-air-temp-viz
 
+buoy_final |> 
+  ggplot() +
+  geom_jitter(aes(x = factor(mm), y = atmp, color = factor(mm)), width = 0.1, alpha = 0.1) +
+  geom_smooth(aes(x = mm, y = atmp), color = "black") +
+  scale_color_viridis_d() +
+  guides(color = "none") +
+  theme_light() +
+  labs(x = "Month in 2024", y = "Air Temperature (Celsius)", title = "Monterey Bay Caynon Air Temperature on 2024", caption = "Source: NOAA National Data Buoy Center")
 
 ```
 
