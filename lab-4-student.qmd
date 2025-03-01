@@ -15,17 +15,17 @@ echo: true
 
 Set up your GitHub workflow (either using the method of creating a repository and using Version Control to set up your project or vice versa using the `usethis` package commands we have learned).
 
-Use appropriate naming conventions for your project (see Code Style Guide), e.g. `lab-4-import-data`.  
+Use appropriate naming conventions for your project (see Code Style Guide), e.g. `lab-4-import-data`.
 
-Your project folder should contain the following:  
+Your project folder should contain the following:
 
-- .Rproj  
-- `lab-4-student.qmd` 
-- "data-raw" folder
-    + `buoy_2024.txt`
-- "data-clean" folder that contains final data set  
-- rendered document  
-- rendered document (`.md`)  
+-   .Rproj\
+-   `lab-4-student.qmd`
+-   "data-raw" folder
+    -   `buoy_2024.txt`
+-   "data-clean" folder that contains final data set\
+-   rendered document\
+-   rendered document (`.md`)
 
 ## Seeking Help
 
@@ -73,9 +73,10 @@ In addition, the data file also stores a "comment" in the second row that contai
 Finally, notice that the data storage type is `txt` which means we cannot use `read_csv()` to import the data. Instead
 
 ## Step 1: Reading the Data into `R`
-Read the data into R. Since it is a `txt` file it is considered a "whitespace-separated file".  Use the (readr)[https://readr.tidyverse.org/index.html] website to determine the appropriate `read_XXX()` function.  
 
-When you read in the data give it an appropriate name for what the data represents. The read in file should look like this (note this is just the first seven columns):  
+Read the data into R. Since it is a `txt` file it is considered a "whitespace-separated file". Use the (readr)\[https://readr.tidyverse.org/index.html\] website to determine the appropriate `read_XXX()` function.
+
+When you read in the data give it an appropriate name for what the data represents. The read in file should look like this (note this is just the first seven columns):
 
 ```{r, eval = FALSE}
 #| label: load-data
@@ -85,10 +86,11 @@ head(buoy, 7)
 
 ```
 
-Notice that the data is all read in as a character value and the first row contains information that is not data, but additional information about the variables: this is called a "comment" in the data.  
+Notice that the data is all read in as a character value and the first row contains information that is not data, but additional information about the variables: this is called a "comment" in the data.
 
-## Step 2: Specify the Comment Row  
-In your data, you will notice the `#` in front of `yr` in the second row. That is the symbol that indicates a comment in the data set. Using the cheatsheet or the (readr)[https://readr.tidyverse.org/index.html] website, add an argument to your function that indicates that the comment row begins with `#`.  Your data should now look like this:
+## Step 2: Specify the Comment Row
+
+In your data, you will notice the `#` in front of `yr` in the second row. That is the symbol that indicates a comment in the data set. Using the cheatsheet or the (readr)\[https://readr.tidyverse.org/index.html\] website, add an argument to your function that indicates that the comment row begins with `#`. Your data should now look like this:
 
 ```{r, eval = FALSE}
 #| label: load-data-comment
@@ -98,9 +100,9 @@ head(buoy, 7)
 
 ```
 
+## Step 3: Clean the Variable Names
 
-## Step 3: Clean the Variable Names  
-We want to use snake_case for our variable names. Use the `janitor` package to clean the variable names. Notice, that because month was originally coded `MM` and minute was originally coded `mm` that now month is `mm` and minute is `mm_2` to create a distinction between them.  
+We want to use snake_case for our variable names. Use the `janitor` package to clean the variable names. Notice, that because month was originally coded `MM` and minute was originally coded `mm` that now month is `mm` and minute is `mm_2` to create a distinction between them.
 
 ```{r, eval = FALSE}
 #| label: clean-names
@@ -111,9 +113,10 @@ head(buoy)
 ```
 
 ## Step 4: Write the Data Part 1
-We will have a bit of cleaning to do on the data, but we have an issue. The 99 and 999's in the data are numeric and not character values. In order for us to specify them as `NA`s we need to do a little work around.  
 
-Write the data to a `csv` file called `buoy_update.csv`. Be sure to write it to your `data-raw` folder.  
+We will have a bit of cleaning to do on the data, but we have an issue. The 99 and 999's in the data are numeric and not character values. In order for us to specify them as `NA`s we need to do a little work around.
+
+Write the data to a `csv` file called `buoy_update.csv`. Be sure to write it to your `data-raw` folder.
 
 ```{r, eval = FALSE}
 #| label: write-data-part-1
@@ -121,13 +124,12 @@ Write the data to a `csv` file called `buoy_update.csv`. Be sure to write it to 
 buoy_update <- write_csv(buoy, file = "raw-data/buoy_update.csv")
 ```
 
+## Step 5: Dealing with Missing Values
 
+Now we will read the data back in, be sure to assign the it a meaningful object name, **BUT** we are going to do two things:
 
-## Step 5: Dealing with Missing Values  
-Now we will read the data back in, be sure to assign the it a meaningful object name, **BUT** we are going to do two things:  
-
-1. Specify all column type *defaults* as character.  
-2. Specify `NA`s as "99" and "999"
+1.  Specify all column type *defaults* as character.\
+2.  Specify `NA`s as "99" and "999"
 
 Remember that now we are reading back in a data file of type `csv`. Now when you look at the data we should have `NA` instead of `99` or `999` in our data, for example:
 
@@ -140,9 +142,9 @@ head(noaa_buoy)
 
 ```
 
-This is great! But we created another problem. Now all of our numeric values are being treated like characters and we don't want that. There are a couple of ways to fix this. We can write and reread in the data setting the column types to `double` or we can use the `readr` parsing functions. 
+This is great! But we created another problem. Now all of our numeric values are being treated like characters and we don't want that. There are a couple of ways to fix this. We can write and reread in the data setting the column types to `double` or we can use the `readr` parsing functions.
 
-Here is the code you can use to fix the data without exporting and importing again (we will learn more about the `mutate()` function. Insert whatever you called your buoy data on the last import for `your_file_name`.  
+Here is the code you can use to fix the data without exporting and importing again (we will learn more about the `mutate()` function. Insert whatever you called your buoy data on the last import for `your_file_name`.
 
 ```{r, eval = FALSE}
 #| label: parse-double
@@ -153,17 +155,16 @@ head(buoy_final)
 
 write_csv(buoy_final, file = "clean-data/buoy_final.csv")
 ```
+
 ```{r}
 buoy_final <- read_csv("clean-data/buoy_final.csv")
 ```
 
-
-
-Now we have our clean, correctly classified, data ready for analysis as `buoy_final`. Go ahead and write that data as a `csv` file into your `data-clean` file. Once you've done that. Set the data cleaning code chunks to `eval: false` so that you do not rerun them again when you render the document. 
-
+Now we have our clean, correctly classified, data ready for analysis as `buoy_final`. Go ahead and write that data as a `csv` file into your `data-clean` file. Once you've done that. Set the data cleaning code chunks to `eval: false` so that you do not rerun them again when you render the document.
 
 # Part 3: Recreate the Following Visualization
-Now that are data is "analytic ready", go ahead and read in your clean data and use it to try and recreate the following visualization. Do your best to match the following visualization as close as possible. (Hint: when specifying color, you may need to use `factor()` to get R to treat a continuous value as discrete).  
+
+Now that are data is "analytic ready", go ahead and read in your clean data and use it to try and recreate the following visualization. Do your best to match the following visualization as close as possible. (Hint: when specifying color, you may need to use `factor()` to get R to treat a continuous value as discrete).
 
 ```{r}
 #| label: monterey-air-temp-viz
@@ -192,10 +193,15 @@ One fun source for data is [Tidy Tuesday](https://github.com/rfordatascience/tid
 
 **For your found data write a brief description of the data and and provide its source.**
 
->Insert your description and link to your source here. Identify 2-3 research questions you could try to answer with this data.  
+> https://docs.google.com/spreadsheets/d/1KVd_7IsOHM9Xe1PDIf47Q4LnQt4J6QFjS5UL1i_GzpA/edit?usp=sharing
 
-
-
+> This dataset is a part of my independent capstone project studying the differences between fish communities in different types of habitat. I helped collect these data over the course of two summers along with several graduate and undergraduate students. This particular dataset looks at each drop or transect as a case, with previously calculated species richness and diversity measurements. This dataset can help answer these questions:
+>
+> -   Is there greater abundance and diversity of fishes in high relief versus low relief rocky substrate?
+>
+> -   Does species richness and diversity increase with depth?
+>
+> -   Are sampling methods (SCUBA or Lander) equivalent in capturing species richness and diversity?
 
 # Lab 4 Submission
 
